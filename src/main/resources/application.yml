@@ -1,0 +1,11 @@
+server.port: 5678
+spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+  data:
+    mongodb:
+      uri: "mongodb://localhost/axonframework"
+      auto-index-creation: true
+
+axon.serializer.general: jackson
