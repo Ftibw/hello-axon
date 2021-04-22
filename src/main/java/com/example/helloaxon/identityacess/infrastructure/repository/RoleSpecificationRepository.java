@@ -48,6 +48,14 @@ public class RoleSpecificationRepository implements IRoleSpecificationRepository
         return true;
     }
 
+    //todo 定时刷一刷
+    public void clearExpiredCaches() {
+        RoleView one = mongoOperations.findOne(new Query(), RoleView.class);
+        if (one != null) {
+            existsInView(one.getId(), one.getName());
+        }
+    }
+
     @Override
     public boolean existsOnCreate(String id, String roleName) {
         if (existsInView(id, roleName)) {
