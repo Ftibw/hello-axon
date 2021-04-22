@@ -16,19 +16,15 @@ public interface IRoleSpecificationRepository {
 
     /**
      * 1.先查视图表是否存在
-     * 2.视图表不存在，直接插入存在约束的缓存表，无异常则继续聚合操作
+     * 2.视图表不存在，直接保存到存在约束的缓存表，无异常则继续聚合操作
      */
-    boolean existsOnCreate(String id, String roleName);
-
-    /**
-     * 1.先查视图表是否存在
-     * 2.视图表不存在，直接修改存在约束的缓存表，无异常则继续聚合操作
-     */
-    boolean existsOnUpdate(String id, String roleName);
+    boolean exists(String id, String roleName);
 
     /**
      * 删除缓存
      */
     void remove(String id);
+
+    void clearExpiredCaches();
 
 }

@@ -1,17 +1,17 @@
 package com.example.helloaxon.identityacess.domain.aggregate;
 
-import com.example.helloaxon.identityacess.domain.specification.IRoleSpecificationRepository;
+import com.example.helloaxon.identityacess.domain.command.CreateRoleCmd;
 import com.example.helloaxon.identityacess.domain.command.DeleteRoleCmd;
 import com.example.helloaxon.identityacess.domain.command.UpdateRoleCmd;
 import com.example.helloaxon.identityacess.domain.event.RoleCreatedEvent;
 import com.example.helloaxon.identityacess.domain.event.RoleDeletedEvent;
 import com.example.helloaxon.identityacess.domain.event.RoleUpdatedEvent;
+import com.example.helloaxon.identityacess.domain.specification.IRoleSpecificationRepository;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
-import com.example.helloaxon.identityacess.domain.command.CreateRoleCmd;
 import org.bson.types.ObjectId;
 
 import java.util.LinkedHashSet;
@@ -37,7 +37,7 @@ public class Role {
     public Role(CreateRoleCmd cmd, IRoleSpecificationRepository repository) {
         String id = new ObjectId().toHexString();
         String name = cmd.getName();
-        if (repository.existsOnCreate(id, name)) {
+        if (repository.exists(id, name)) {
             throw new IllegalArgumentException("角色名称已存在");
         }
         AggregateLifecycle.apply(new RoleCreatedEvent(id, name, cmd.getFunctionIds()));
@@ -48,7 +48,7 @@ public class Role {
     public void handle(UpdateRoleCmd cmd, IRoleSpecificationRepository repository) {
         String id = cmd.getId();
         String newName = cmd.getName();
-        if (repository.existsOnUpdate(id, newName)) {
+        if (repository.exists(id, newName)) {
             throw new IllegalArgumentException("角色名称已存在");
         }
         AggregateLifecycle.apply(new RoleUpdatedEvent());

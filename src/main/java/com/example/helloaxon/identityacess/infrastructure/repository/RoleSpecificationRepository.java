@@ -15,7 +15,6 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -48,21 +47,13 @@ public class RoleSpecificationRepository implements IRoleSpecificationRepository
         return true;
     }
 
-    //todo 定时刷一刷
-    public void clearExpiredCaches() {
-        RoleView one = mongoOperations.findOne(new Query(), RoleView.class);
-        if (one != null) {
-            existsInView(one.getId(), one.getName());
-        }
-    }
-
     @Override
-    public boolean existsOnCreate(String id, String roleName) {
+    public boolean exists(String id, String roleName) {
         if (existsInView(id, roleName)) {
             return true;
         }
         try {
-            mongoOperations.insert(RoleSpecification.builder()
+            mongoOperations.save(RoleSpecification.builder()
                     .id(id)
                     .name(roleName)
                     .build());
@@ -73,25 +64,17 @@ public class RoleSpecificationRepository implements IRoleSpecificationRepository
     }
 
     @Override
-    public boolean existsOnUpdate(String id, String roleName) {
-        if (existsInView(id, roleName)) {
-            return true;
-        }
-        try {
-            mongoOperations.updateFirst(
-                    Query.query(Criteria.where("id").is(id)),
-                    Update.update("name", roleName),
-                    RoleSpecification.class
-            );
-            return false;
-        } catch (DuplicateKeyException ignored) {
-            return true;
-        }
-    }
-
-    @Override
     public void remove(String id) {
         mongoOperations.remove(Query.query(Criteria.where("id").is(id)), RoleSpecification.class);
+    }
+
+    //todo 定时刷一刷
+    @Override
+    public void clearExpiredCaches() {
+        RoleView one = mongoOperations.findOne(new Query(), RoleView.class);
+        if (one != null) {
+            existsInView(one.getId(), one.getName());
+        }
     }
 
     @Getter
